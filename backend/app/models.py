@@ -1,4 +1,5 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Text, Float, DateTime
+import enum
+from sqlalchemy import Enum, Boolean, Column, ForeignKey, Integer, String, Text, Float, DateTime
 from sqlalchemy.orm import relationship
 import datetime
 
@@ -16,18 +17,6 @@ class User(Base):
     profile = relationship("UserProfile", back_populates="user", uselist=False)
     progress = relationship("LearningProgress", back_populates="user")
     
-class UserProfile(Base):
-    __tablename__ = "user_profiles"
-    
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    first_name = Column(String)
-    last_name = Column(String)
-    learning_style = Column(String)
-    experience_level = Column(String)
-    goals = Column(Text)
-    
-    user = relationship("User", back_populates="profile")
 
 class Course(Base):
     __tablename__ = "courses"
@@ -75,3 +64,26 @@ class LearningProgress(Base):
     
     user = relationship("User", back_populates="progress")
     lesson = relationship("Lesson", back_populates="progress")
+
+class LearningStyleEnum(enum.Enum):
+    VISUAL = "Visual"
+    AUDITORY = "Auditory"
+    KINESTHETIC = "Kinesthetic"
+
+class ExperienceLevelEnum(enum.Enum):
+    BEGINNER = "Beginner"
+    INTERMEDIATE = "Intermediate"
+    ADVANCED = "Advanced"
+
+class UserProfile(Base):
+    __tablename__ = "user_profiles"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    first_name = Column(String)
+    last_name = Column(String)
+    learning_style = Column(Enum(LearningStyleEnum), default=LearningStyleEnum.VISUAL)
+    experience_level = Column(Enum(ExperienceLevelEnum), default=ExperienceLevelEnum.BEGINNER)
+    goals = Column(Text)
+    
+    user = relationship("User", back_populates="profile")
