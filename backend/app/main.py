@@ -98,7 +98,7 @@ def chat(request: schemas.ChatRequest):
     }
 
 @app.post("/user_profiles/", response_model=schemas.UserProfile, status_code=status.HTTP_201_CREATED)
-def create_user_profile(user_profile: schemas.UserProfileCreate, db: Session = Depends(get_db)):
+def create_user_profile(user_profile: schemas.UserProfileCreate, db: Session = Depends(get_db),current_user: models.User = Depends(auth.get_current_active_user)):
     db_user = db.query(models.User).filter(models.User.id == user_profile.user_id).first()
     if not db_user:
         raise HTTPException(status_code=400, detail="User not found")
@@ -110,7 +110,7 @@ def create_user_profile(user_profile: schemas.UserProfileCreate, db: Session = D
     return db_user_profile
 
 @app.post("/courses/", response_model=schemas.Course, status_code=status.HTTP_201_CREATED)
-def create_course(course: schemas.CourseCreate, db: Session = Depends(get_db)):
+def create_course(course: schemas.CourseCreate, db: Session = Depends(get_db),current_user: models.User = Depends(auth.get_current_active_user)):
     db_course = models.Course(**course.dict())
     db.add(db_course)
     db.commit()
@@ -118,7 +118,7 @@ def create_course(course: schemas.CourseCreate, db: Session = Depends(get_db)):
     return db_course
 
 @app.post("/courses", response_model=schemas.Course, status_code=status.HTTP_201_CREATED)
-def create_course_no_slash(course: schemas.CourseCreate, db: Session = Depends(get_db)):
+def create_course_no_slash(course: schemas.CourseCreate, db: Session = Depends(get_db),current_user: models.User = Depends(auth.get_current_active_user)):
     db_course = models.Course(**course.dict())
     db.add(db_course)
     db.commit()
@@ -126,7 +126,7 @@ def create_course_no_slash(course: schemas.CourseCreate, db: Session = Depends(g
     return db_course
 
 @app.post("/modules/", response_model=schemas.Module, status_code=status.HTTP_201_CREATED)
-def create_module(module: schemas.ModuleCreate, db: Session = Depends(get_db)):
+def create_module(module: schemas.ModuleCreate, db: Session = Depends(get_db),current_user: models.User = Depends(auth.get_current_active_user)):
     db_course = db.query(models.Course).filter(models.Course.id == module.course_id).first()
     if not db_course:
         raise HTTPException(status_code=400, detail="Course not found")
@@ -137,7 +137,7 @@ def create_module(module: schemas.ModuleCreate, db: Session = Depends(get_db)):
     return db_module
 
 @app.post("/lessons/", response_model=schemas.Lesson, status_code=status.HTTP_201_CREATED)
-def create_lesson(lesson: schemas.LessonCreate, db: Session = Depends(get_db)):
+def create_lesson(lesson: schemas.LessonCreate, db: Session = Depends(get_db),current_user: models.User = Depends(auth.get_current_active_user)):
     db_module = db.query(models.Module).filter(models.Module.id == lesson.module_id).first()
     if not db_module:
         raise HTTPException(status_code=400, detail="Module not found")
